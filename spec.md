@@ -1,12 +1,12 @@
 # Bài nộp LAB5 — T2 · Nhóm NTH
 
-**Lớp:** ____ · **Bàn / zone:** ____ · **Track:** ____
+**Lớp:** L3B · **Track:** 02
 
 | Họ và Tên | Mã Học Viên | Việc đã làm |
-|Đặng Nhật Huy| 2A202603822 |---|
-|  |  |  |
-|  |  |  |
-|  |  |  |
+|---|---|---|
+| Triệu Hải Đăng Trình | 2A202603874 | Phần §1, §2, §3, §6 |
+| Chu Văn Nhật | 2A202603848 | Phần §1, §2, §4, §6 |
+| Đặng Nhật Huy | 2A202603822 | Phần §1, §2, §5, §6 |
 
 ## §1. Lát cắt & phạm vi
 **Lát cắt:** 
@@ -54,28 +54,260 @@ Bối cảnh chung: tối 13/11, 22:00–23:30, Bài tập 3 hết hạn 23:59 t
 **Vì sao đắt hơn các kịch bản còn lại:** KB2, KB3, KB7, KB9, KB11 đều *sửa được*. Học viên hoặc TA sẽ phát hiện khi đọc lại, khi TA trả lời sáng hôm sau, hoặc khi nộp bài. KB1, KB8, KB12 chỉ *nhẹ*: trả lời kém nhưng không sai bài học.
 
 ## §3. Khi AI sai  (chặng 3)
-Với mỗi kịch bản đắt nhất:
-- AI nói gì (nguyên văn) · người dùng thấy gì · làm gì tiếp · ai được báo, sau bao lâu.
-- Quyết định: hỏi lại / trả lời kèm giới hạn / dừng và chuyển người — chọn cách nào, đã loại cách nào, vì sao.
-- Loại lỗi (hệ thống / người dùng / ngữ cảnh) và vì sao cách nói, cách sửa đi theo loại đó.
-- 2–3 nguyên tắc HAX/PAIR, mỗi cái trỏ vào một chỗ cụ thể (câu chữ hoặc chỗ trên màn hình).
-- Lỗi nào sửa câu chữ không cứu được (nếu có), và thiết kế cứu nó thế nào.
+
+### 3.1 Đánh giá mức nghiêm trọng
+
+Đây là **thang ưu tiên thiết kế dựa trên fixture**, không phải phép đo rủi ro chính xác tuyệt đối. Điểm tổng dùng trọng số: Impact 25% + Scope 15% + Undetectability 20% + Irreversibility 20% + Likelihood 10% + Time criticality 10%.
+
+| Kịch bản | Impact | Scope | Khó phát hiện | Khó đảo ngược | Khả năng xảy ra | Nhạy thời gian | Tổng · tier | Kết luận PM |
+|---|---|---|---|---|---|---|---|---|
+| **KB6** | **4** — học sai quan hệ giữa hai khái niệm nền | **5** — câu sai nằm trong §3.3 dùng chung cho cả lớp | **5** — mã mục đúng làm nguồn sai có vẻ đáng tin | **3** — sửa được về sau nhưng kiến thức sai đã được học/áp dụng | **4** — `tra_cuu_tai_lieu` dễ truy xuất nguyên câu | **3** — sau 22:00 chưa có TA, nhưng không phụ thuộc riêng hạn Bài 3 | **4,05 · Critical** | Ưu tiên cao nhất: vẫn giúp phần toán chắc chắn, đồng thời cô lập và đưa đoạn nguồn vào luồng xác minh. |
+| **KB4** | **4** — giải hộ làm mất mục tiêu tự học và tính toàn vẹn đánh giá | **1** — lần gửi này tác động trực tiếp một học viên | **2** — học viên biết mình đã xin lời giải, nên hành vi dễ nhận ra | **5** — đáp số đã đọc/chép thì không thu hồi được | **5** — yêu cầu trực tiếp cộng áp lực hạn nộp | **5** — chỉ còn dưới một giờ đến 23:59, TA đã hết giờ | **3,55 · High** | Chặn lời giải ở lúc tạo nội dung, nhưng trả một gợi ý bước đầu có ích ngay. |
+| **KB5** | **4** — xác nhận biến kết quả tự làm thành đáp án được AI bảo chứng | **1** — lần xác nhận này tác động trực tiếp một học viên | **3** — câu “đúng/sai” ngắn dễ bị xem là hỗ trợ bình thường | **5** — tín hiệu xác nhận đã lộ thì không thu hồi được | **5** — học viên đã có kết quả nên AI rất dễ so sánh và xác nhận | **5** — cần quyết định trước hạn 23:59, TA đã hết giờ | **3,75 · High** | Chặn mọi tín hiệu xác nhận và chuyển sang quy trình tự kiểm phương pháp. |
+
+KB6 nguy hiểm dù không gây mất tiền hay sức khỏe: nó làm sai mô hình kiến thức nền một cách âm thầm, nguồn chính thức và mã §3.3 lại khuếch đại niềm tin, và phạm vi có thể là cả lớp. KB4–KB5 không đảo ngược vì sau khi học viên thấy đáp số hoặc tín hiệu xác nhận, giao diện không thể làm họ “chưa biết” lại. KB6 có phạm vi và độ khó phát hiện lớn hơn; KB4–KB5 nhạy thời gian hơn vì Bài 3 sắp đóng. Vì vậy KB6 cần trạng thái nguồn, bằng chứng đối chiếu và escalation có sự đồng ý; KB4–KB5 cần guardrail tức thời ngay trong luồng gợi ý, không lấy chuyển TA sau 08:00 làm đường chính.
+
+### 3.2 KB6 — Tài liệu §3.3 có câu sai
+
+**A. Tình huống và failure mode.** Học viên hỏi nguyên văn: **“§3.3 nói độ lệch chuẩn luôn nhỏ hơn phương sai, vậy phương sai 0,25 thì độ lệch chuẩn bao nhiêu?”** Câu có vấn đề trong §3.3 là: *“Vì là căn bậc hai, độ lệch chuẩn luôn nhỏ hơn phương sai.”* Phép kiểm tra trực tiếp là \(\sqrt{0,25}=0,5\) và \(0,5>0,25\), nên mệnh đề “luôn nhỏ hơn” không đúng trong trường hợp này. `tra_cuu_tai_lieu` có thể tìm đúng câu và đúng mã mục nhưng đó chỉ là **được tìm thấy trong tài liệu**, không phải **đã được kiểm chứng**; trích dẫn đúng nguồn sai còn làm học viên tin sai hơn.
+
+**B. Câu AI nói nguyên văn.**
+
+> “Mình phát hiện một mâu thuẫn cần tách rõ. Phần chắc chắn từ phép tính là \(\sqrt{0,25}=0,5\), và \(0,5>0,25\). Trong tài liệu §3.3 có câu ‘Vì là căn bậc hai, độ lệch chuẩn luôn nhỏ hơn phương sai’; câu khẳng định ‘luôn’ này không khớp với phép kiểm tra trên nên cần giảng viên xác minh. Mình chưa coi câu đó là nguồn đã được kiểm chứng và cũng chưa sửa tài liệu. TA làm việc lại từ 08:00; bạn có muốn chuyển đúng đoạn §3.3 cùng phép kiểm tra này vào hàng chờ của TA không?”
+
+**C. Người dùng thấy gì ngoài câu chữ.**
+
+- Nhãn cam **“Phát hiện mâu thuẫn trong nguồn”** và trạng thái **“Có trong tài liệu · Chưa được giảng viên kiểm chứng”**; không dùng nhãn xanh “Nguồn đúng”.
+- Thẻ căn cứ **“Buổi 3 · §3.3 Phương sai và độ lệch chuẩn”** đặt cạnh hai ô đối chiếu: **“Tài liệu: độ lệch chuẩn luôn nhỏ hơn phương sai”** và **“Phép kiểm: √0,25 = 0,5; 0,5 > 0,25”**.
+- Khối **“Chắc chắn”** chỉ chứa phép tính; khối **“Cần xác minh”** chỉ chứa mệnh đề tổng quát trong tài liệu.
+- Ba điều khiển: **“Xem §3.3”**, **“Tiếp tục phần chắc chắn”**, **“Chuyển đoạn này cho TA”**. Nút chuyển mở màn hình xem trước gói gửi, chưa gửi ngay.
+- Nếu học viên không thao tác, trạng thái giữ ở **“Chưa chuyển · Chưa sửa nguồn”**; không gọi `chuyen_TA`, không đăng FAQ và không tuyên bố tài liệu đã sửa.
+
+**D. Bước tiếp theo.** Học viên có thể mở đúng §3.3, tiếp tục xem phần giải thích chỉ dựa trên phép kiểm chắc chắn, hoặc chủ động chọn chuyển TA. Ở màn hình xem trước, học viên bấm **“Xác nhận gửi TA”** hoặc **“Quay lại”**. Không thao tác thì không có hành động hậu trường nào xảy ra.
+
+**E. Ai được báo, khi nào và thấy gì.** Chỉ sau khi học viên bấm **“Xác nhận gửi TA”**, `chuyen_TA` mới tạo mục cho TA gồm: câu hỏi nguyên văn; mã §3.3; câu bị nghi sai; phép kiểm \(\sqrt{0,25}=0,5>0,25\); toàn bộ câu AI đã trả lời; timestamp lúc gửi; lý do **“Nguồn và phép kiểm mâu thuẫn”**. Gói không có nhận xét về năng lực học viên. Nếu gửi sau 22:00 và tool xác nhận thành công, giao diện mới hiện **“Đã vào hàng chờ · TA có thể xem sớm nhất từ 08:00 ngày 14/11/2026”**; nếu gửi lỗi, hiện **“Chưa gửi được · Thử lại”** và giữ gói xem trước. Không hứa TA trả lời ngay hay hoàn tất trước hạn Bài 3.
+
+**F. Quyết định sản phẩm.** Cân nhắc ba phương án: (1) hỏi lại, (2) trả lời kèm giới hạn, (3) dừng và chuyển người. **Chọn (2) trả lời kèm giới hạn + đề nghị chuyển TA**: câu hỏi, mục nguồn và số kiểm tra đã đủ rõ, nên hỏi lại chỉ tăng ma sát; phép căn bậc hai là phần chắc chắn có thể giúp ngay, nên dừng hoàn toàn làm mất giá trị trong lúc TA nghỉ; còn mệnh đề tổng quát vượt khỏi phần có thể tự xác minh nên phải khoanh lại. Không tự sửa tài liệu vì AI không có thẩm quyền chỉnh nguồn; không tự đăng `dang_FAQ` vì nội dung chưa được kiểm chứng có thể lan từ một người ra cả lớp.
+
+**G. Loại lỗi.** Đây chủ yếu là **lỗi hệ thống/nguồn sự thật**, không phải lỗi người dùng: học viên trích đúng §3.3, AI cũng có thể truy xuất đúng nhưng nguồn chứa mệnh đề sai. Câu chữ không đổ lỗi cho học viên; sửa trước mắt bằng trạng thái nguồn và ranh giới chắc chắn/chưa chắc, sửa về sau bằng quy trình gắn cờ đúng đoạn cho TA/giảng viên thẩm định.
+
+### 3.3 KB4 — Học viên xin giải hộ Bài tập 3
+
+**Tin nhắn nguyên văn:** **“Giải giúp em bài 3 với, 11h rồi em không kịp.”**
+
+**Câu AI nói nguyên văn:**
+
+> “Mình hiểu bạn đang gấp, nhưng Bài tập 3 vẫn mở đến 23:59 ngày 13/11/2026 nên mình không thể tính hộ hoặc đưa đáp số. Mình có thể giúp bước đầu theo §3.2: hãy sắp xếp dữ liệu theo thứ tự tăng dần; vì dãy có số lượng giá trị chẵn, bạn tự xác định hai vị trí ở giữa. Gửi lại hai vị trí bạn chọn hoặc cách bạn xác định chúng, mình sẽ gợi ý bước tiếp theo mà không xác nhận kết quả cuối.”
+
+**Người dùng thấy và làm tiếp.** Giao diện có nhãn **“Bài đang mở · Đáp số được bảo vệ”**, đồng hồ **“Hạn 23:59 · 13/11/2026”**, thẻ căn cứ **“§3.2 Trung vị”**, và vùng **“Gợi ý 1/3”** chỉ hiện bước đầu. Các nút là **“Mở §3.2”** và **“Gửi bước em đã làm”**; không có nút **“Xem lời giải”**. Học viên tự xác định hai vị trí giữa rồi gửi phương pháp để nhận gợi ý theo tầng; hệ thống không dùng chính hai giá trị giữa để làm gần hết bài thay học viên.
+
+**Ai được báo.** Mặc định **không ai được báo**: đây là yêu cầu học tập có thể phục vụ an toàn bằng gợi ý bước đầu, không phải sự cố cần giám sát. Có thể có nút phụ **“Đưa câu hỏi vào hàng chờ TA”**, nhưng chỉ gửi sau xác nhận và phải ghi rõ **“TA có thể xem từ 08:00 ngày 14/11/2026, sau hạn nộp”**; vì vậy đây không phải đường cứu hạn.
+
+**Quyết định và phương án loại.** Chọn **trả lời kèm giới hạn**. Không hỏi lại vì ý định “giải giúp” và trạng thái Bài 3 đã rõ. Không dừng/chuyển người làm đường chính vì TA hết giờ, phản hồi sớm nhất sau 08:00 không giải quyết hạn 23:59, trong khi §3.2 vẫn cho phép giúp hợp lệ ngay. Loại phương án giải rồi nhắc “không nên chép” vì một khi `goi_y_bai_tap` đã hiện đáp số thì lời cảnh báo không thu hồi được thông tin.
+
+**Loại lỗi.** Nếu AI giải đúng toán nhưng đưa đáp số, đó là **lỗi ngữ cảnh**: nội dung đúng nhưng hành vi sai với bài đang mở. Học viên không bị quy lỗi vì đã xin trợ giúp; thiết kế phải nhận biết trạng thái bài và đổi từ “giải” sang **first-step hint workflow**.
+
+### 3.4 KB5 — Học viên xin xác nhận đáp số
+
+**Tin nhắn nguyên văn:** **“Em tính trung bình ra 15,25, trung vị 11,5, đúng không ạ?”**
+
+**Câu AI nói nguyên văn:**
+
+> “Vì Bài tập 3 vẫn đang mở đến 23:59 ngày 13/11/2026, mình không thể nói kết quả cuối của bạn đúng, sai hay gần đúng, cũng không thể tính lại để so sánh thay bạn. Bạn có thể tự kiểm theo checklist: (1) với trung bình, đếm đủ số giá trị, cộng lại và chia cho đúng số lượng theo §3.1; (2) với trung vị, sắp xếp tăng dần, kiểm tra số lượng là chẵn hay lẻ, rồi áp dụng quy tắc hai vị trí giữa ở §3.2; (3) ghi lại từng bước độc lập trước khi đối chiếu với kết quả của chính bạn. Bạn có thể gửi các bước tính hoặc mô tả quy trình; mình sẽ kiểm tra phương pháp mà không xác nhận đáp số cuối.”
+
+**Người dùng thấy và làm tiếp.** Giao diện có nhãn **“Bài đang mở · Không xác nhận đáp số”**, hạn 23:59, hai thẻ căn cứ **“§3.1 Trung bình cộng”** và **“§3.2 Trung vị”**, checklist chưa đánh dấu sẵn và ô **“Gửi các bước/phương pháp”**. Không tô xanh/đỏ kết quả học viên, không nêu kết quả nào cần sửa, không có điểm số hay phần trăm “gần đúng”. Học viên tự chạy checklist rồi gửi lập luận; AI chỉ phản hồi từng bước phương pháp, không tính lại và so sánh kết quả cuối.
+
+**Ai được báo.** Mặc định **không ai được báo**, cùng lý do như KB4: đây không phải sự cố và TA sau 08:00 không thể hỗ trợ trước hạn. Nếu học viên chủ động chọn hàng chờ TA, hệ thống phải xin xác nhận và nói rõ thời điểm sớm nhất, không hứa cứu hạn.
+
+**Quyết định và phương án loại.** Chọn **trả lời kèm giới hạn + self-check workflow**. Không hỏi lại vì học viên đã nêu rõ cần xác nhận gì. Không chuyển người làm đường chính vì không kịp hạn và vẫn có thể dạy cách tự kiểm. Loại mọi biến thể “đúng”, “sai”, “gần đúng”, “xem lại phần…” và việc âm thầm tính lại: tất cả đều phát tín hiệu về đáp số. Xác nhận cũng làm lộ thông tin đánh giá dù AI không giải từ đầu; câu đúng về toán vẫn là hành vi sản phẩm sai khi bài đang mở. Vì vậy KB5 cần tự kiểm, khác KB4 cần gợi ý bước đầu.
+
+**Loại lỗi.** Đây cũng chủ yếu là **lỗi ngữ cảnh** nếu AI trả lời theo năng lực toán mà bỏ qua trạng thái đánh giá. Không coi việc học viên đưa kết quả của mình là lỗi người dùng; hệ thống chịu trách nhiệm không biến kết quả đó thành đáp án được bảo chứng.
+
+### 3.5 So sánh UX theo mức nghiêm trọng
+
+| Kịch bản | Điều cần chặn | Điều vẫn nên giúp | Escalation | Trạng thái nếu không thao tác |
+|---|---|---|---|---|
+| **KB6 · Critical** | Không coi đoạn truy xuất là chân lý; không tự sửa/đăng FAQ | Nêu phép tính chắc chắn, chỉ rõ mâu thuẫn và căn cứ §3.3 | Đề nghị chuyển đúng đoạn + bằng chứng; chỉ gửi khi học viên xác nhận | **Chưa chuyển · Nguồn chưa được kiểm chứng** |
+| **KB4 · High** | Không tính hộ, không đưa đáp số | **First-step hint:** mở §3.2, yêu cầu học viên tự tìm hai vị trí giữa | Không chuyển mặc định; TA là tùy chọn có cảnh báo sau hạn | **Gợi ý 1/3 · Chờ bước của học viên** |
+| **KB5 · High** | Không xác nhận đúng/sai/gần đúng, không tính lại để so sánh | **Self-check:** checklist §3.1–§3.2 và kiểm tra phương pháp | Không chuyển mặc định; TA là tùy chọn có cảnh báo sau hạn | **Chưa đánh giá kết quả · Chờ phương pháp** |
+
+Không dùng một mẫu từ chối cho cả ba: KB6 cần hiển thị độ tin cậy của **nguồn** và đường xác minh; KB4 cần giới hạn độ sâu của **gợi ý**; KB5 cần triệt tiêu tín hiệu **xác nhận**. Mức hại khác nhau vì thế đổi cả nhãn, hành động tiếp theo và điều kiện escalation.
+
+### 3.6 Ba nguyên tắc HAX/PAIR chính
+
+- **[P1] G2 — Làm rõ hệ thống làm tốt đến đâu.** Câu KB6 tách *“phần chắc chắn từ phép tính”* khỏi *“cần giảng viên xác minh”*; trên giao diện là nhãn **“Có trong tài liệu · Chưa được giảng viên kiểm chứng”** và hai vùng **“Chắc chắn / Cần xác minh”**. Với KB4–KB5, nhãn **“Bài đang mở”** nói rõ giới hạn hỗ trợ. Đây là biểu hiện của PAIR *Explainability + Trust*: tin đúng mức, không tối đa hóa niềm tin.
+- **[P2] G10 — Thu hẹp phạm vi khi nghi ngờ.** KB6 chỉ trả phần phép tính có thể kiểm; KB4 chỉ đưa **Gợi ý 1/3**; KB5 chỉ kiểm tra phương pháp. Các vùng/nút **“Tiếp tục phần chắc chắn”**, **“Gửi bước em đã làm”**, **“Gửi các bước/phương pháp”** biến giới hạn thành đường đi hữu ích thay vì từ chối trống.
+- **[P3] G11 — Giải thích vì sao.** Cả ba câu đều nêu lý do ngay tại chỗ: mâu thuẫn với phép kiểm, hoặc **“Bài tập 3 vẫn đang mở đến 23:59”**. Thẻ **“Căn cứ”** trỏ §3.3/§3.2/§3.1 và màn hình xem trước **“Vì sao chuyển TA: Nguồn và phép kiểm mâu thuẫn”** cho phép người dùng kiểm tra quyết định. Đây cũng là PAIR *Errors + Graceful Failure*: mỗi lỗi có một đường lui phù hợp.
+
+Ba mã `[P1]`–`[P3]` là đầu vào để §5 gắn trực tiếp lên các vùng prototype tương ứng.
+
+### 3.7 Lỗi mà sửa câu chữ không cứu được
+
+**KB6 — lỗi kiến trúc nguồn.** Nếu hệ thống mặc định mọi đoạn do `tra_cuu_tai_lieu` trả về là đúng, một cảnh báo viết hay hơn vẫn đặt nguồn sai vào vai trò căn cứ. Thiết kế phải tách trạng thái **“tìm thấy”** khỏi **“đã kiểm chứng”**, cho phép gắn cờ đúng đoạn, loại đoạn đang bị nghi khỏi căn cứ chắc chắn, và chuyển đoạn + phép kiểm cho TA/giảng viên; `dang_FAQ` không được chạy trước khi có xác minh.
+
+**KB4–KB5 — lỗi guardrail tạo nội dung.** Nếu `goi_y_bai_tap` vẫn có thể sinh hoặc hiển thị đáp số, câu “không nên chép” không ngăn được thiệt hại. Thiết kế phải kiểm tra trạng thái bài **trước** khi tạo gợi ý, chặn cả đưa lẫn xác nhận đáp số, dùng gợi ý theo tầng, và chỉ mở giải thích đầy đủ sau khi bài đóng **và** đáp án đã công bố.
+
+Các giới hạn trên là **yêu cầu UX/policy đầu vào cho Chặng 4**, không phải tuyên bố đã thiết kế xong mức tự chủ của các tool.
+
+### 3.8 Bốn đường đi của trải nghiệm
+
+1. **Happy path:** Khi căn cứ từ buổi đã mở không mâu thuẫn, AI giảng phần được hỏi và gắn thẻ mã mục để học viên tự mở kiểm tra.
+2. **Low-confidence:** Khi câu hỏi mơ hồ như “cái độ lệch”, AI thu hẹp phạm vi bằng hai cách hiểu có căn cứ hoặc hỏi lại một câu trước khi giảng.
+3. **Failure/no evidence:** Khi không có căn cứ hoặc nguồn mâu thuẫn như KB6, AI chỉ trả phần kiểm được, hiển thị giới hạn và mở đường chuyển người có xác nhận.
+4. **Correction:** Khi học viên báo câu trả lời có vấn đề, AI giữ nguyên ngữ cảnh và cho chọn **“Sai ở nguồn”**, **“Sai ở phép tính”** hoặc **“Sai ở cách giải thích”**; phản hồi được đính kèm vào cùng căn cứ, không tự sửa nguồn hay tự đăng FAQ.
 
 ## §4. Mức tự chủ  (chặng 4)
-Với mỗi tool:
-- Mức của nhóm (tự làm / cần người duyệt / cấm). Nếu cần người duyệt: ai duyệt · người duyệt thấy gì · quá hạn thì sao.
-- Lý do theo cost-of-error: sai thì ai chịu gì · đảo lại được không · chờ người thì mất gì.
-- Phương án đã cân nhắc và vì sao loại.
-Thêm:
-- Tool khó xếp nhất: mỗi người từng chọn gì, cái giá của mỗi phía (trỏ về kịch bản ở §2), nhóm chốt thế nào.
-- Thử mức đã đặt trên 2 kịch bản đắt nhất + 1 kịch bản bình thường: cái sai có bị chặn không? còn việc nào làm khi lẽ ra phải hỏi? người dùng bình thường có phải chờ vô ích không?
-- Luật thêm hoặc tool tách bước (nếu có), và vì sao.
-- Một mức tự chủ đã đổi lời hứa nào với người dùng.
+
+### 4.1 Mức tự chủ của bốn tool
+
+| Tool | Mức chốt | Kiểm soát bắt buộc |
+|---|---|---|
+| `tra_cuu_tai_lieu` | **Tự làm, kèm trạng thái nguồn** | Hiện buổi + mã mục; phân biệt **“Tìm thấy trong tài liệu”** với **“Đã được xác minh”**; gắn cờ khi nguồn mâu thuẫn với phép kiểm. |
+| `goi_y_bai_tap` | **Tự làm với policy guardrail bắt buộc** | Kiểm tra trạng thái bài, phân loại ý định và kiểm tra đầu ra trước khi hiển thị. |
+| `chuyen_TA` | **Cần học viên xác nhận** | AI chỉ soạn gói; học viên xem trước và bấm **“Xác nhận gửi TA”**; chỉ báo đã gửi sau khi tool thành công. |
+| `dang_FAQ` | **Cần TA duyệt** | AI chỉ tạo bản nháp ẩn danh; TA kiểm tra nguồn, trạng thái bài và quyết định xuất bản. |
+
+#### `tra_cuu_tai_lieu` — Tự làm, kèm trạng thái nguồn
+
+- **Cost-of-error:** Tool chỉ đọc nên không thay đổi dữ liệu và có thể tra cứu lại, nhưng học viên có thể chịu tác hại nhận thức khó phát hiện nếu đoạn truy xuất được trình bày như chân lý. KB6 cho thấy AI có thể trích đúng §3.3 và đúng mã mục trong khi chính nguồn chứa câu sai; nội dung đã học/áp dụng không thể được coi là “đảo ngược” chỉ bằng cách đóng đoạn trích.
+- **Cost-of-waiting:** Nếu TA phải duyệt mọi lần tra cứu, học viên hỏi lúc 23:00 phải chờ ít nhất đến khung làm việc từ 08:00, làm mất giá trị trợ lý ban đêm ngay cả với câu bình thường như KB1.
+- **Phương án:** (1) Tự làm và tin tuyệt đối nguồn — loại vì KB6 chứng minh “có trong tài liệu” không đồng nghĩa “đã kiểm chứng”; (2) TA duyệt mọi truy xuất — loại vì tạo chờ vô ích và quá tải; (3) **tự làm kèm trạng thái nguồn** — chọn vì giữ tốc độ của thao tác đọc nhưng không chuyển uy tín của tài liệu thành độ chắc chắn giả.
+
+#### `goi_y_bai_tap` — Tự làm với policy guardrail bắt buộc
+
+- **Cost-of-error:** Học viên chịu mất cơ hội tự làm và tính toàn vẹn đánh giá nếu AI đưa hoặc xác nhận đáp số Bài 3 đang mở. Dù câu trả lời đúng toán, đáp số đã nhìn thấy thì không thu hồi được; KB4 và KB5 vì thế là lỗi không đảo ngược.
+- **Cost-of-waiting:** Cấm hoàn toàn làm học viên không nhận được hỗ trợ hợp lệ; chờ TA duyệt từng gợi ý đến sau 08:00 không giải quyết hạn 23:59. AI cần giúp ngay bằng first-step hint ở KB4 hoặc self-check ở KB5.
+- **Phương án:** Tự do giải — loại vì có thể làm hộ; chờ TA duyệt/cấm mọi gợi ý — loại vì bỏ rơi người học ban đêm; **tự làm với guardrail ở cả đầu vào và đầu ra** — chọn vì hỗ trợ được phương pháp mà không tiết lộ kết quả. Số câu hay độ dài không phải cơ chế an toàn chính: ba câu vẫn có thể chứa trọn lời giải.
+
+#### `chuyen_TA` — Cần học viên xác nhận
+
+- **Cost-of-error:** Tự gửi có thể chuyển hội thoại ngoài ý muốn, truyền dữ liệu không cần thiết, tạo ticket nhầm và làm học viên tưởng vấn đề đã được xử lý. TA có thể đóng ticket, nhưng dữ liệu đã gửi không thể coi như chưa từng được chia sẻ; học viên và TA cùng chịu chi phí hiểu nhầm/tải xử lý.
+- **Cost-of-waiting:** Một bước xem trước và xác nhận ngắn có chi phí thấp; cấm chuyển ngoài giờ lại làm mất đường báo nguồn sai như KB6. Ticket được tạo ngay khi gửi thành công, còn sau 22:00 TA chỉ có thể **bắt đầu xem** từ 08:00 hôm sau.
+- **Phương án:** (1) Tự gửi — loại vì trái luồng xác nhận của §3; (2) cấm chuyển ngoài giờ — loại vì không ghi nhận được vấn đề cần người xử lý; (3) **cần học viên xác nhận** — chọn vì chặn gửi nhầm mà vẫn chuẩn bị được gói ngay. Không hứa TA trả lời lúc 08:00 hoặc xử lý trước hạn.
+
+#### `dang_FAQ` — Cần TA duyệt
+
+- **Cost-of-error:** Cả lớp có thể học sai hoặc thấy thông tin bài đang mở nếu AI xuất bản nhầm. Bài có thể gỡ nhưng người đọc đã ghi nhớ/chụp lại, nên phạm vi và độ khó đảo ngược lớn hơn trả lời riêng; KB6 và KB10 là bằng chứng trực tiếp.
+- **Cost-of-waiting:** Chờ duyệt làm FAQ cập nhật chậm, nhưng học viên hiện tại vẫn được trợ lý hỗ trợ riêng. Đổi lại, TA có cơ hội chặn việc khuếch đại nguồn chưa xác minh hoặc đáp số đang được bảo vệ.
+- **Phương án:** Tự đăng khi câu hỏi lặp lại — loại vì tần suất không chứng minh nội dung đúng; cấm hoàn toàn — loại vì mất kho tri thức và tăng việc tổng hợp thủ công; **TA duyệt trước khi xuất bản** — chọn vì cân bằng khả năng soạn thảo của AI với trách nhiệm phát hành của con người. TA kiểm tra trước khi xuất bản giúp giảm đáng kể nguy cơ lan truyền nội dung sai, nhưng không thể loại bỏ hoàn toàn rủi ro.
+
+### 4.2 Tool khó xếp nhất
+
+**`dang_FAQ` khó xếp nhất** vì cả ba mức đều có giá:
+
+- **Tự làm:** giúp nhiều học viên ngay, nhưng có thể khuếch đại câu sai từ nguồn chính thức ở KB6 hoặc đăng nội dung chưa xác minh ở KB10.
+- **Cấm hoàn toàn:** chặn lan truyền, nhưng bỏ giá trị kho tri thức và buộc TA tổng hợp lại câu hỏi thủ công.
+- **Cần TA duyệt — mức chốt:** AI soạn bản nháp ẩn danh; TA kiểm tra rồi mới xuất bản. Mức này giữ đúng §1 (**không tự đăng FAQ**) và đặt chi phí chờ nhỏ hơn cost-of-error của việc cả lớp đọc sai.
+
+> **Cần nhóm xác nhận trước demo:** ghi lựa chọn ban đầu thật của từng thành viên và lý do; không bịa lịch sử tranh luận nếu chưa thảo luận. Repository hiện không có bằng chứng đủ để gán quan điểm cho từng người.
+
+### 4.3 Thử mức tự chủ trên ba kịch bản
+
+| Kịch bản | Cái sai có bị chặn? | AI còn làm quá quyền không? | Người dùng có chờ vô ích không? |
+|---|---|---|---|
+| **KB6 — nguồn §3.3 sai** | Có. Đoạn truy xuất mang trạng thái **“Nguồn cần xác minh”**; không được dùng như căn cứ chắc chắn hay xuất bản FAQ trước khi TA duyệt. | Không. AI trả phần phép tính chắc chắn và tự soạn gói, nhưng học viên phải xem trước/xác nhận; chỉ hiện **“Đã vào hàng chờ”** sau khi `chuyen_TA` thành công. | Không. Học viên xem ngay phép kiểm chắc chắn; chỉ phần xác minh nguồn chờ TA có thể bắt đầu xem từ 08:00. |
+| **KB4–KB5 — xin giải/xác nhận đáp số Bài 3** | Có. Guardrail chặn lời giải, phép thế số dẫn đến đáp số và mọi tín hiệu đúng/sai/gần đúng; KB4 nhận first-step hint, KB5 nhận self-check. | Không. AI chỉ kiểm tra quy trình/gợi ý theo tầng, không tính lại để so sánh và không tự chuyển TA. | Không. Hỗ trợ hợp lệ xuất hiện ngay trong đêm; học viên không phải đợi TA sau hạn 23:59. |
+| **KB1 — hỏi trung vị và trung bình** | Có. Câu trả lời bị giới hạn ở nội dung có trong §3.1–§3.2, kèm mã mục và trạng thái nguồn. | Không. Câu hỏi đã rõ nên AI tự tra cứu/giảng, không hỏi lại, không tạo ticket và không cần duyệt. | Không. Đây là happy path: học viên nhận giải thích ngay thay vì chờ TA duyệt một thao tác chỉ đọc. |
+
+### 4.4 Luật bổ sung và tách bước
+
+**A. Trạng thái nguồn cho `tra_cuu_tai_lieu`.** Mọi kết quả có buổi, mã mục và trạng thái **“Tìm thấy trong tài liệu”**. Chỉ nội dung đã qua quy trình xác minh mới mang trạng thái **“Đã được xác minh”**; khi có phép kiểm mâu thuẫn như KB6, đoạn đó chuyển thành **“Nguồn cần xác minh”**, không được dùng làm căn cứ chắc chắn hay đầu vào xuất bản FAQ.
+
+**B. Guardrail ba bước cho `goi_y_bai_tap`.** Guardrail dựa trên trạng thái và nội dung, không dựa chủ yếu vào độ dài:
+
+1. **Kiểm tra trạng thái bài:** bài đã đóng **và** đã công bố đáp án như Bài 2 được giải thích đầy đủ; bài đang mở như Bài 3 kích hoạt Socratic/self-check. Nếu chưa thỏa cả hai điều kiện “đã đóng” và “đã công bố đáp án”, vẫn giữ bảo vệ đáp số.
+2. **Phân loại ý định:** xin giải từ đầu → first-step hint; xin xác nhận kết quả → self-check workflow; hỏi khái niệm → giảng từ tài liệu nhưng không dùng dữ liệu Bài 3 để tính ra kết quả.
+3. **Kiểm tra đầu ra:** chặn đáp số cuối, phép thế số dẫn thẳng đến đáp số, “đúng/sai/gần đúng”, màu hoặc phần trăm làm lộ mức đúng, và việc âm thầm tính lại để so sánh. Cho phép nhắc mã mục, yêu cầu học viên thực hiện bước tiếp theo, kiểm tra quy trình và mở gợi ý tầng sau khi học viên đưa bước tự làm.
+
+**C. Tách `chuyen_TA` thành năm bước.** (1) AI **soạn gói** cục bộ, chưa truyền dữ liệu; (2) học viên **xem trước** câu hỏi, phần hội thoại liên quan, nguồn, lý do chuyển và mốc TA có thể bắt đầu xem; (3) học viên **xác nhận gửi**; (4) tool **gửi gói** và tạo ticket ngay nếu thành công; (5) giao diện phản hồi **“Đã vào hàng chờ”** khi thành công hoặc **“Chưa gửi được · Thử lại”** khi thất bại, đồng thời giữ gói xem trước để thử lại. Nếu học viên không xác nhận hoặc xác nhận hết hạn, không gửi và chỉ giữ gói cục bộ trong phiên; tuyệt đối không báo “đã chuyển”.
+
+**D. Luồng duyệt `dang_FAQ`.** AI chỉ tạo **Draft** đã ẩn danh học viên. TA thấy câu hỏi, câu trả lời đề xuất, nguồn đối chiếu, trạng thái bài tập và cảnh báo nguồn chưa xác minh; TA quyết định xuất bản. Sau 24 giờ chưa duyệt, nội dung vẫn là Draft, không tự xuất bản; nội dung dựa trên nguồn bị gắn cờ phải chờ xác minh trước khi được đăng.
+
+### 4.5 Mức tự chủ thay đổi lời hứa sản phẩm
+
+> **“Trợ lý học bài ban đêm giúp bạn tự tiến từng bước dựa trên tài liệu khóa học, nói rõ khi nguồn chưa chắc chắn và chuẩn bị câu hỏi cho TA khi cần. Hệ thống chỉ báo hành động đã hoàn tất sau khi công cụ xác nhận thành công, đồng thời hiển thị trung thực thời điểm TA có thể bắt đầu xem.”**
+
+Lời hứa này chỉ cam kết điều sản phẩm kiểm soát được: hỗ trợ đúng phạm vi, minh bạch độ chắc chắn và báo trung thực trạng thái tool. Sản phẩm không hứa giáo trình luôn đúng, không bảo đảm TA trả lời lúc 08:00 hay trước hạn, và không biến “có trích dẫn” thành “đã được kiểm chứng”.
 
 ## §5. Prototype  (chặng 5)
-- Link hoặc file · công cụ · phần nào mock · có lời gọi AI thật không.
-- 1–2 ảnh có đánh số; mỗi số: thể hiện gì · nguyên tắc HAX/PAIR nào · mức tự chủ nào.
-- Quyết định: cách hiện độ chắc/bằng chứng và điều khiển mức tự chủ — đã nghĩ tới cách nào khác, vì sao chọn cách này.
+
+### 5.1 Thông tin prototype
+
+- **File:** `index.html`, một file HTML tự chứa, mở bằng trình duyệt là chạy, không cần cài đặt.
+- **Công cụ:** HTML + CSS + JavaScript thuần, không dùng thư viện ngoài.
+- **Phần mock:**
+  - Toàn bộ câu trả lời của trợ lý trong 12 kịch bản là kịch bản dựng sẵn. Câu chữ lấy nguyên văn từ §3.
+  - Dữ liệu khoá học và tài liệu buổi 3 lấy từ fixture của track.
+  - Hàng chờ TA, bản nháp FAQ và nút "Giảng viên đã xác minh" chỉ lưu trong trang, không có backend.
+  - Giờ hệ thống được giả lập (mặc định 22:40 ngày 13/11/2026).
+  - Có công tắc giả lập "gửi TA lỗi".
+- **Lời gọi AI thật:** có đường gọi Anthropic API (tuỳ chọn, nhập API key trên bảng điều khiển). Prompt hệ thống chứa tài liệu buổi 3, trang khoá học và 8 luật của §3–§4. Câu trả lời được render bằng cùng các khối giao diện, kèm mã mục. Bản dùng khi demo chạy ở chế độ mock.
+- **Hai màn hình:**
+  - *Học viên:* khung chat và thanh bên trang khoá học.
+  - *Màn hình TA:* hàng chờ câu được chuyển, bản nháp FAQ chờ duyệt, nguồn bị gắn cờ, cài đặt mức tự chủ.
+
+### 5.2 Ảnh có đánh số
+
+**Ảnh 1 — KB6 · Tài liệu §3.3 có câu sai** *(lúc đang hiện bản xem trước gói gửi TA)*
+
+![Ảnh 1](prototype/anh1-KB6.png)
+
+| Số | Thể hiện gì | Nguyên tắc HAX/PAIR | Mức tự chủ |
+|---|---|---|---|
+| ① | Nhãn cam "Phát hiện mâu thuẫn trong nguồn" + "Có trong tài liệu · Chưa được giảng viên kiểm chứng"; không dùng nhãn xanh "Nguồn đúng" | [P1] HAX G2 · PAIR Explainability + Trust | `tra_cuu_tai_lieu`: Tự làm, kèm trạng thái nguồn |
+| ② | Hai ô đối chiếu *Tài liệu / Phép kiểm* và hai khối *Chắc chắn / Cần xác minh* | [P1] HAX G2 | — |
+| ③ | Ba điều khiển: Xem §3.3 · Tiếp tục phần chắc chắn · Chuyển đoạn này cho TA | [P2] HAX G10 | — |
+| ④ | Bản xem trước gói gửi TA: câu hỏi, nguồn, câu bị nghi, phép kiểm, "Vì sao chuyển TA: Nguồn và phép kiểm mâu thuẫn", thời điểm TA xem sớm nhất (08:00 ngày 14/11/2026, sau hạn nộp); chỉ gửi khi bấm "Xác nhận gửi TA" | [P3] HAX G11 · PAIR Errors + Graceful Failure | `chuyen_TA`: Cần học viên xác nhận |
+| ⑤ | Thẻ căn cứ "Buổi 3 · §3.3" mang trạng thái "Nguồn cần xác minh" | [P3] HAX G11 | `tra_cuu_tai_lieu`: Tự làm, kèm trạng thái nguồn |
+
+**Ảnh 2 — KB4 · Xin giải hộ Bài tập 3**
+
+![Ảnh 2](prototype/anh2-KB4.png)
+
+| Số | Thể hiện gì | Nguyên tắc HAX/PAIR | Mức tự chủ |
+|---|---|---|---|
+| ① | Nhãn "Bài đang mở · Đáp số được bảo vệ" + "Hạn 23:59 · 13/11/2026" | [P1] HAX G2 | — |
+| ② | Vùng "Gợi ý 1/3" chỉ hiện bước đầu | [P2] HAX G10 | `goi_y_bai_tap`: Tự làm với guardrail |
+| ③ | Lý do nêu ngay trong câu trả lời: "Bài tập 3 vẫn mở đến 23:59" + thẻ căn cứ §3.2 | [P3] HAX G11 | — |
+| ④ | Nút "Mở §3.2" và "Gửi bước em đã làm"; không có nút "Xem lời giải" | [P2] HAX G10 | `goi_y_bai_tap`: Tự làm với guardrail |
+| ⑤ | Nút phụ "Đưa câu hỏi vào hàng chờ TA", ghi rõ TA xem từ 08:00 ngày 14/11/2026, sau hạn nộp | [P3] HAX G11 · PAIR Errors + Graceful Failure | `chuyen_TA`: Cần học viên xác nhận |
+| ⑥ | Hạn và trạng thái "đang mở" lấy từ trang khoá học (thanh bên) | [P3] HAX G11 | — |
+
+### 5.3 Quyết định thiết kế
+
+**A. Cách hiện độ chắc**
+
+- **Đã cân nhắc:**
+  1. Phần trăm độ tin cậy ("Độ chắc 72%").
+  2. Một nhãn màu cho cả câu trả lời (cao / vừa / thấp).
+  3. Thanh mức.
+  4. **Tách nội dung theo trạng thái:** khối "Chắc chắn" / "Cần xác minh", kèm nhãn trạng thái nguồn.
+- **Chọn (4).** Trong KB6, một câu trả lời chứa cả phần chắc chắn (√0,25 = 0,5) lẫn phần chưa chắc (mệnh đề "luôn nhỏ hơn" ở §3.3). Một nhãn chung cho cả câu sẽ hoặc làm phần toán đúng trông đáng ngờ, hoặc làm câu sai trong tài liệu trông đáng tin. Tách khối thì học viên biết phần nào dùng được ngay, phần nào phải chờ giảng viên.
+- **Loại (1)** vì con số phần trăm không có căn cứ đo trong fixture, học viên lại đọc nó như điểm số. Với bài đang mở (KB5), số phần trăm còn có thể bị hiểu thành "gần đúng".
+- **(2) và (3)** vẫn giữ trên bảng điều khiển để so sánh, nhưng chỉ dùng cho câu trả lời đồng nhất như KB1.
+
+**B. Cách hiện bằng chứng**
+
+- **Đã cân nhắc:**
+  1. Trích nguyên đoạn ngay trong câu trả lời.
+  2. Chú thích cuối câu trả lời.
+  3. **Chip mã mục bấm để mở, kèm trạng thái nguồn**, cộng nút "Xem §x.x" mở đúng mục trong tài liệu.
+- **Chọn (3).** Chip luôn hiện mã mục, đáp ứng yêu cầu của giảng viên ("nói rõ tài liệu buổi mấy, mục nào"). Trạng thái nguồn đi kèm chip (Tìm thấy trong tài liệu / Nguồn cần xác minh / Đã được xác minh) để "có trích dẫn" không bị hiểu thành "đã kiểm chứng" (§4.4A). Mở tài liệu thì câu bị nghi được tô màu.
+- **Loại (1)** vì câu trả lời dài gấp đôi, lúc 23:00 học viên khó đọc. **Loại (2)** vì căn cứ nằm xa câu nó chứng minh, trạng thái nguồn dễ bị bỏ qua.
+
+**C. Điều khiển mức tự chủ**
+
+- **Đã cân nhắc:**
+  1. Một công tắc chung "trợ lý tự làm / hỏi trước" cho học viên.
+  2. Hộp thoại xác nhận bật lên trước mọi hành động.
+  3. **Điều khiển gắn vào đúng hành động, theo mức của từng tool.**
+- **Chọn (3):**
+  - `chuyen_TA` có thẻ xem trước nằm ngay trong câu trả lời, nút "Xác nhận gửi TA" / "Quay lại", trạng thái trung thực (Chưa chuyển → Đã vào hàng chờ / Chưa gửi được · Thử lại).
+  - `goi_y_bai_tap` có tầng "Gợi ý 1/3" và nút "Gửi bước em đã làm"; tầng sau chỉ mở khi học viên đưa bước tự làm.
+  - `dang_FAQ` chỉ có phía TA: bản nháp, nút "Xuất bản" bị khoá khi nguồn chưa được xác minh.
+  - Mức của từng tool do giảng viên/TA đặt trên Màn hình TA, học viên không đổi được.
+- **Loại (1)** vì một công tắc chung không phân biệt được thao tác chỉ đọc (`tra_cuu_tai_lieu`) với thao tác không đảo lại được (`goi_y_bai_tap`). Học viên lúc gấp hạn sẽ chọn "tự làm" cho mọi thứ.
+- **Loại (2)** vì hỏi trước cả việc tra cứu sẽ làm học viên chờ vô ích ở KB1. Hộp thoại bật lên cũng che mất phần giải thích "vì sao chuyển TA" mà [P3] cần hiện.
 
 ## §6. Tốt là gì  (chặng 6 — nhẹ, bỏ được nếu thiếu giờ)
 - 3 tiêu chí Pass/Fail chấm được; thiết kế của nhóm đạt tiêu chí nào trên 2 kịch bản đắt nhất; lỗi còn lại.
