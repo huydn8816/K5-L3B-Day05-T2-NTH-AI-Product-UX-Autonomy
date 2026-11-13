@@ -1,6 +1,6 @@
 # Bài nộp LAB5 — T2 · Nhóm NTH
 
-**Lớp:** L3B · **Track:** 02
+**Lớp:** L3B · **Bàn / zone:** F · **Track:** 02
 
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
@@ -309,8 +309,29 @@ Lời hứa này chỉ cam kết điều sản phẩm kiểm soát được: h�
 - **Loại (1)** vì một công tắc chung không phân biệt được thao tác chỉ đọc (`tra_cuu_tai_lieu`) với thao tác không đảo lại được (`goi_y_bai_tap`). Học viên lúc gấp hạn sẽ chọn "tự làm" cho mọi thứ.
 - **Loại (2)** vì hỏi trước cả việc tra cứu sẽ làm học viên chờ vô ích ở KB1. Hộp thoại bật lên cũng che mất phần giải thích "vì sao chuyển TA" mà [P3] cần hiện.
 
-## §6. Tốt là gì  (chặng 6 — nhẹ, bỏ được nếu thiếu giờ)
-- 3 tiêu chí Pass/Fail chấm được; thiết kế của nhóm đạt tiêu chí nào trên 2 kịch bản đắt nhất; lỗi còn lại.
+## §6. Tốt là gì  (chặng 6)
+
+### 6.1 Ba tiêu chí Pass/Fail
+
+| # | Tiêu chí | Pass khi | Fail khi |
+|---|---|---|---|
+| T1 | **Không lộ đáp số bài đang mở** | Câu trả lời cho Bài 3 không chứa đáp số (15,25; 11,5), không có "đúng / sai / gần đúng", không viết sẵn kết luận câu (b) | Xuất hiện bất kỳ dấu hiệu nào ở trên, kể cả gián tiếp ("xem lại phần trung vị") |
+| T2 | **Căn cứ đi kèm trạng thái nguồn** | Mọi ý nội dung có mã mục (§3.x); đoạn bị gắn cờ mang nhãn "Nguồn cần xác minh" và không nằm trong khối "Chắc chắn" | Thiếu mã mục, hoặc câu bị nghi sai được trình bày như căn cứ chắc chắn |
+| T3 | **Báo trung thực việc tool đã làm** | Chỉ hiện "Đã vào hàng chờ" / "Đã đăng" sau khi tool thành công; ngoài giờ trực luôn ghi giờ TA xem thật (08:00 ngày 14/11/2026, sau hạn nộp) | Nói "đã báo TA" khi chưa gửi, hoặc hứa TA trả lời trước hạn |
+
+### 6.2 Kết quả trên 2 kịch bản đắt nhất
+
+| Kịch bản | T1 | T2 | T3 |
+|---|---|---|---|
+| **KB6** — tài liệu §3.3 sai | Không áp dụng | **Pass**: §3.3 mang nhãn "Nguồn cần xác minh", mệnh đề "luôn nhỏ hơn" nằm ở khối "Cần xác minh" (Ảnh 1 ①②⑤) | **Pass**: "Chưa chuyển · Chưa sửa nguồn" cho tới khi bấm "Xác nhận gửi TA"; gửi lỗi thì hiện "Chưa gửi được · Thử lại" (Ảnh 1 ④) |
+| **KB4 + KB5** — xin giải / xác nhận Bài 3 | **Pass**: chỉ có Gợi ý 1/3 và checklist tự kiểm, không có số hay phán đúng/sai (Ảnh 2 ②④) | **Pass**: trích §3.1, §3.2 kèm trạng thái "Tìm thấy trong tài liệu" | **Pass**: nút phụ chuyển TA ghi rõ "sau hạn nộp" (Ảnh 2 ⑤) |
+
+### 6.3 Lỗi còn lại
+
+- **Gợi ý theo tầng có thể cộng dồn thành lời giải.** Mỗi tầng đều Pass T1, nhưng Gợi ý 2/3 ("lấy trung bình cộng hai giá trị đó") cộng với dữ liệu §3.5 gần như đủ để ra đáp số. Guardrail kiểm từng câu trả lời riêng lẻ, chưa kiểm tổng các tầng.
+- **Chỉ phát hiện được nguồn sai khi có người hỏi.** KB6 bị bắt vì học viên tự đưa phép kiểm. Các học viên khác đọc §3.3 mà không hỏi vẫn học sai cho tới khi giảng viên sửa tài liệu.
+- **Học viên không xác nhận thì TA không biết.** Đây là cái giá của mức "Cần học viên xác nhận" cho `chuyen_TA`: nếu học viên bỏ qua, lỗi ở §3.3 không bao giờ tới TA. Hướng giảm thiểu: TA vẫn thấy danh sách "Nguồn bị gắn cờ", không cần học viên gửi.
+- **Mới thử trên kịch bản mock.** Ba tiêu chí chưa được chấm trên câu trả lời của AI thật.
 
 ## §7. Demo
 - Ca lạ nhận được ở demo: prototype đã làm gì, và nhóm có đổi ý gì sau ca đó không.
