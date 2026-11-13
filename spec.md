@@ -157,15 +157,77 @@ Các giới hạn trên là **yêu cầu UX/policy đầu vào cho Chặng 4**, 
 4. **Correction:** Khi học viên báo câu trả lời có vấn đề, AI giữ nguyên ngữ cảnh và cho chọn **“Sai ở nguồn”**, **“Sai ở phép tính”** hoặc **“Sai ở cách giải thích”**; phản hồi được đính kèm vào cùng căn cứ, không tự sửa nguồn hay tự đăng FAQ.
 
 ## §4. Mức tự chủ  (chặng 4)
-Với mỗi tool:
-- Mức của nhóm (tự làm / cần người duyệt / cấm). Nếu cần người duyệt: ai duyệt · người duyệt thấy gì · quá hạn thì sao.
-- Lý do theo cost-of-error: sai thì ai chịu gì · đảo lại được không · chờ người thì mất gì.
-- Phương án đã cân nhắc và vì sao loại.
-Thêm:
-- Tool khó xếp nhất: mỗi người từng chọn gì, cái giá của mỗi phía (trỏ về kịch bản ở §2), nhóm chốt thế nào.
-- Thử mức đã đặt trên 2 kịch bản đắt nhất + 1 kịch bản bình thường: cái sai có bị chặn không? còn việc nào làm khi lẽ ra phải hỏi? người dùng bình thường có phải chờ vô ích không?
-- Luật thêm hoặc tool tách bước (nếu có), và vì sao.
-- Một mức tự chủ đã đổi lời hứa nào với người dùng.
+
+### 4.1 Mức tự chủ của bốn tool
+
+| Tool | Mức chốt | Kiểm soát bắt buộc |
+|---|---|---|
+| `tra_cuu_tai_lieu` | **Tự làm, kèm trạng thái nguồn** | Hiện buổi + mã mục; phân biệt **“Tìm thấy trong tài liệu”** với **“Đã được xác minh”**; gắn cờ khi nguồn mâu thuẫn với phép kiểm. |
+| `goi_y_bai_tap` | **Tự làm với policy guardrail bắt buộc** | Kiểm tra trạng thái bài, phân loại ý định và kiểm tra đầu ra trước khi hiển thị. |
+| `chuyen_TA` | **Cần học viên xác nhận** | AI chỉ soạn gói; học viên xem trước và bấm **“Xác nhận gửi TA”**; chỉ báo đã gửi sau khi tool thành công. |
+| `dang_FAQ` | **Cần TA duyệt** | AI chỉ tạo bản nháp ẩn danh; TA kiểm tra nguồn, trạng thái bài và quyết định xuất bản. |
+
+#### `tra_cuu_tai_lieu` — Tự làm, kèm trạng thái nguồn
+
+- **Cost-of-error:** Tool chỉ đọc nên không thay đổi dữ liệu và có thể tra cứu lại, nhưng học viên có thể chịu tác hại nhận thức khó phát hiện nếu đoạn truy xuất được trình bày như chân lý. KB6 cho thấy AI có thể trích đúng §3.3 và đúng mã mục trong khi chính nguồn chứa câu sai; nội dung đã học/áp dụng không thể được coi là “đảo ngược” chỉ bằng cách đóng đoạn trích.
+- **Cost-of-waiting:** Nếu TA phải duyệt mọi lần tra cứu, học viên hỏi lúc 23:00 phải chờ ít nhất đến khung làm việc từ 08:00, làm mất giá trị trợ lý ban đêm ngay cả với câu bình thường như KB1.
+- **Phương án:** (1) Tự làm và tin tuyệt đối nguồn — loại vì KB6 chứng minh “có trong tài liệu” không đồng nghĩa “đã kiểm chứng”; (2) TA duyệt mọi truy xuất — loại vì tạo chờ vô ích và quá tải; (3) **tự làm kèm trạng thái nguồn** — chọn vì giữ tốc độ của thao tác đọc nhưng không chuyển uy tín của tài liệu thành độ chắc chắn giả.
+
+#### `goi_y_bai_tap` — Tự làm với policy guardrail bắt buộc
+
+- **Cost-of-error:** Học viên chịu mất cơ hội tự làm và tính toàn vẹn đánh giá nếu AI đưa hoặc xác nhận đáp số Bài 3 đang mở. Dù câu trả lời đúng toán, đáp số đã nhìn thấy thì không thu hồi được; KB4 và KB5 vì thế là lỗi không đảo ngược.
+- **Cost-of-waiting:** Cấm hoàn toàn làm học viên không nhận được hỗ trợ hợp lệ; chờ TA duyệt từng gợi ý đến sau 08:00 không giải quyết hạn 23:59. AI cần giúp ngay bằng first-step hint ở KB4 hoặc self-check ở KB5.
+- **Phương án:** Tự do giải — loại vì có thể làm hộ; chờ TA duyệt/cấm mọi gợi ý — loại vì bỏ rơi người học ban đêm; **tự làm với guardrail ở cả đầu vào và đầu ra** — chọn vì hỗ trợ được phương pháp mà không tiết lộ kết quả. Số câu hay độ dài không phải cơ chế an toàn chính: ba câu vẫn có thể chứa trọn lời giải.
+
+#### `chuyen_TA` — Cần học viên xác nhận
+
+- **Cost-of-error:** Tự gửi có thể chuyển hội thoại ngoài ý muốn, truyền dữ liệu không cần thiết, tạo ticket nhầm và làm học viên tưởng vấn đề đã được xử lý. TA có thể đóng ticket, nhưng dữ liệu đã gửi không thể coi như chưa từng được chia sẻ; học viên và TA cùng chịu chi phí hiểu nhầm/tải xử lý.
+- **Cost-of-waiting:** Một bước xem trước và xác nhận ngắn có chi phí thấp; cấm chuyển ngoài giờ lại làm mất đường báo nguồn sai như KB6. Ticket được tạo ngay khi gửi thành công, còn sau 22:00 TA chỉ có thể **bắt đầu xem** từ 08:00 hôm sau.
+- **Phương án:** (1) Tự gửi — loại vì trái luồng xác nhận của §3; (2) cấm chuyển ngoài giờ — loại vì không ghi nhận được vấn đề cần người xử lý; (3) **cần học viên xác nhận** — chọn vì chặn gửi nhầm mà vẫn chuẩn bị được gói ngay. Không hứa TA trả lời lúc 08:00 hoặc xử lý trước hạn.
+
+#### `dang_FAQ` — Cần TA duyệt
+
+- **Cost-of-error:** Cả lớp có thể học sai hoặc thấy thông tin bài đang mở nếu AI xuất bản nhầm. Bài có thể gỡ nhưng người đọc đã ghi nhớ/chụp lại, nên phạm vi và độ khó đảo ngược lớn hơn trả lời riêng; KB6 và KB10 là bằng chứng trực tiếp.
+- **Cost-of-waiting:** Chờ duyệt làm FAQ cập nhật chậm, nhưng học viên hiện tại vẫn được trợ lý hỗ trợ riêng. Đổi lại, TA có cơ hội chặn việc khuếch đại nguồn chưa xác minh hoặc đáp số đang được bảo vệ.
+- **Phương án:** Tự đăng khi câu hỏi lặp lại — loại vì tần suất không chứng minh nội dung đúng; cấm hoàn toàn — loại vì mất kho tri thức và tăng việc tổng hợp thủ công; **TA duyệt trước khi xuất bản** — chọn vì cân bằng khả năng soạn thảo của AI với trách nhiệm phát hành của con người. TA kiểm tra trước khi xuất bản giúp giảm đáng kể nguy cơ lan truyền nội dung sai, nhưng không thể loại bỏ hoàn toàn rủi ro.
+
+### 4.2 Tool khó xếp nhất
+
+**`dang_FAQ` khó xếp nhất** vì cả ba mức đều có giá:
+
+- **Tự làm:** giúp nhiều học viên ngay, nhưng có thể khuếch đại câu sai từ nguồn chính thức ở KB6 hoặc đăng nội dung chưa xác minh ở KB10.
+- **Cấm hoàn toàn:** chặn lan truyền, nhưng bỏ giá trị kho tri thức và buộc TA tổng hợp lại câu hỏi thủ công.
+- **Cần TA duyệt — mức chốt:** AI soạn bản nháp ẩn danh; TA kiểm tra rồi mới xuất bản. Mức này giữ đúng §1 (**không tự đăng FAQ**) và đặt chi phí chờ nhỏ hơn cost-of-error của việc cả lớp đọc sai.
+
+> **Cần nhóm xác nhận trước demo:** ghi lựa chọn ban đầu thật của từng thành viên và lý do; không bịa lịch sử tranh luận nếu chưa thảo luận. Repository hiện không có bằng chứng đủ để gán quan điểm cho từng người.
+
+### 4.3 Thử mức tự chủ trên ba kịch bản
+
+| Kịch bản | Cái sai có bị chặn? | AI còn làm quá quyền không? | Người dùng có chờ vô ích không? |
+|---|---|---|---|
+| **KB6 — nguồn §3.3 sai** | Có. Đoạn truy xuất mang trạng thái **“Nguồn cần xác minh”**; không được dùng như căn cứ chắc chắn hay xuất bản FAQ trước khi TA duyệt. | Không. AI trả phần phép tính chắc chắn và tự soạn gói, nhưng học viên phải xem trước/xác nhận; chỉ hiện **“Đã vào hàng chờ”** sau khi `chuyen_TA` thành công. | Không. Học viên xem ngay phép kiểm chắc chắn; chỉ phần xác minh nguồn chờ TA có thể bắt đầu xem từ 08:00. |
+| **KB4–KB5 — xin giải/xác nhận đáp số Bài 3** | Có. Guardrail chặn lời giải, phép thế số dẫn đến đáp số và mọi tín hiệu đúng/sai/gần đúng; KB4 nhận first-step hint, KB5 nhận self-check. | Không. AI chỉ kiểm tra quy trình/gợi ý theo tầng, không tính lại để so sánh và không tự chuyển TA. | Không. Hỗ trợ hợp lệ xuất hiện ngay trong đêm; học viên không phải đợi TA sau hạn 23:59. |
+| **KB1 — hỏi trung vị và trung bình** | Có. Câu trả lời bị giới hạn ở nội dung có trong §3.1–§3.2, kèm mã mục và trạng thái nguồn. | Không. Câu hỏi đã rõ nên AI tự tra cứu/giảng, không hỏi lại, không tạo ticket và không cần duyệt. | Không. Đây là happy path: học viên nhận giải thích ngay thay vì chờ TA duyệt một thao tác chỉ đọc. |
+
+### 4.4 Luật bổ sung và tách bước
+
+**A. Trạng thái nguồn cho `tra_cuu_tai_lieu`.** Mọi kết quả có buổi, mã mục và trạng thái **“Tìm thấy trong tài liệu”**. Chỉ nội dung đã qua quy trình xác minh mới mang trạng thái **“Đã được xác minh”**; khi có phép kiểm mâu thuẫn như KB6, đoạn đó chuyển thành **“Nguồn cần xác minh”**, không được dùng làm căn cứ chắc chắn hay đầu vào xuất bản FAQ.
+
+**B. Guardrail ba bước cho `goi_y_bai_tap`.** Guardrail dựa trên trạng thái và nội dung, không dựa chủ yếu vào độ dài:
+
+1. **Kiểm tra trạng thái bài:** bài đã đóng **và** đã công bố đáp án như Bài 2 được giải thích đầy đủ; bài đang mở như Bài 3 kích hoạt Socratic/self-check. Nếu chưa thỏa cả hai điều kiện “đã đóng” và “đã công bố đáp án”, vẫn giữ bảo vệ đáp số.
+2. **Phân loại ý định:** xin giải từ đầu → first-step hint; xin xác nhận kết quả → self-check workflow; hỏi khái niệm → giảng từ tài liệu nhưng không dùng dữ liệu Bài 3 để tính ra kết quả.
+3. **Kiểm tra đầu ra:** chặn đáp số cuối, phép thế số dẫn thẳng đến đáp số, “đúng/sai/gần đúng”, màu hoặc phần trăm làm lộ mức đúng, và việc âm thầm tính lại để so sánh. Cho phép nhắc mã mục, yêu cầu học viên thực hiện bước tiếp theo, kiểm tra quy trình và mở gợi ý tầng sau khi học viên đưa bước tự làm.
+
+**C. Tách `chuyen_TA` thành năm bước.** (1) AI **soạn gói** cục bộ, chưa truyền dữ liệu; (2) học viên **xem trước** câu hỏi, phần hội thoại liên quan, nguồn, lý do chuyển và mốc TA có thể bắt đầu xem; (3) học viên **xác nhận gửi**; (4) tool **gửi gói** và tạo ticket ngay nếu thành công; (5) giao diện phản hồi **“Đã vào hàng chờ”** khi thành công hoặc **“Chưa gửi được · Thử lại”** khi thất bại, đồng thời giữ gói xem trước để thử lại. Nếu học viên không xác nhận hoặc xác nhận hết hạn, không gửi và chỉ giữ gói cục bộ trong phiên; tuyệt đối không báo “đã chuyển”.
+
+**D. Luồng duyệt `dang_FAQ`.** AI chỉ tạo **Draft** đã ẩn danh học viên. TA thấy câu hỏi, câu trả lời đề xuất, nguồn đối chiếu, trạng thái bài tập và cảnh báo nguồn chưa xác minh; TA quyết định xuất bản. Sau 24 giờ chưa duyệt, nội dung vẫn là Draft, không tự xuất bản; nội dung dựa trên nguồn bị gắn cờ phải chờ xác minh trước khi được đăng.
+
+### 4.5 Mức tự chủ thay đổi lời hứa sản phẩm
+
+> **“Trợ lý học bài ban đêm giúp bạn tự tiến từng bước dựa trên tài liệu khóa học, nói rõ khi nguồn chưa chắc chắn và chuẩn bị câu hỏi cho TA khi cần. Hệ thống chỉ báo hành động đã hoàn tất sau khi công cụ xác nhận thành công, đồng thời hiển thị trung thực thời điểm TA có thể bắt đầu xem.”**
+
+Lời hứa này chỉ cam kết điều sản phẩm kiểm soát được: hỗ trợ đúng phạm vi, minh bạch độ chắc chắn và báo trung thực trạng thái tool. Sản phẩm không hứa giáo trình luôn đúng, không bảo đảm TA trả lời lúc 08:00 hay trước hạn, và không biến “có trích dẫn” thành “đã được kiểm chứng”.
 
 ## §5. Prototype  (chặng 5)
 - Link hoặc file · công cụ · phần nào mock · có lời gọi AI thật không.
